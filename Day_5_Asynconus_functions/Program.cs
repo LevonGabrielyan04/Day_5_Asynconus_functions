@@ -86,47 +86,84 @@ class Task3
     }
     public Task RunAtIntervals(int miliseconds,CancellationToken token)
     {
-        return Task.Run(async () =>
+        return Task.Run(() =>
         {
             bool flag = false;
             while (true)
             {
                 foreach (var item in funcsToExecute)
                 {
-                    await item();
-                    Thread.Sleep(miliseconds);
+                    item();
                     if (token.IsCancellationRequested) { 
                         flag = true;
                         break;
                     }
                 }
+                Thread.Sleep(miliseconds);
                 if(flag)
                     break;
             }
+            Program.synchronization.Wait();
         });
     }
     public Task RunAtTime(DateTime date,CancellationToken token)
     {
-        return Task.Run(async () =>
+        return Task.Run(() =>
         {
             Thread.Sleep(date - DateTime.Now);
             foreach (var item in funcsToExecute)
             {
+                item();
                 if (token.IsCancellationRequested) { 
                     break;
                 }
-                await item(); 
             }
+            Program.synchronization.Wait();
         });
+    }
+}
+class SynchronizationByLevon
+{
+    int count;
+    object lockObj;
+    public SynchronizationByLevon(int count)
+    {
+        this.count = count;
+        lockObj = new object();
+    }
+    public void Wait()
+    {
+        lock (lockObj)
+        { 
+            Monitor.Wait(lockObj);
+        }
+    }
+    public void Pulse()
+    {
+        lock (lockObj)
+        {
+            count--;
+            if (count == 0)
+                Monitor.Pulse(lockObj);
+        }
+    }
+    public void PulseAll()
+    {
+        lock (lockObj)
+        { 
+            Monitor.Pulse(lockObj);
+        }
     }
 }
 class Program
 {
+    public static SynchronizationByLevon synchronization;
     static Task Test()
     {
         return Task.Run(() =>
         {
             Console.WriteLine("Running, on the way hiding");
+            synchronization.Pulse();
         });
     }
     public static string bigText = String.Empty;
@@ -146,13 +183,15 @@ class Program
         //await imgs.Resize();
 
         //Task 3
-        //Task3 task3 = new Task3();
-        //task3.funcsToExecute.Add(Test);
+        Task3 task3 = new Task3();
+        task3.funcsToExecute.Add(Test);
 
-        //CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         //cancellationTokenSource.CancelAfter(3);
 
-        //await task3.RunAtIntervals(3000,cancellationTokenSource.Token);
-        //await task3.RunAtTime(DateTime.Now.AddSeconds(4),cancellationTokenSource.Token); 
+        synchronization = new SynchronizationByLevon(task3.funcsToExecute.Count);
+        //await task3.RunAtTime(DateTime.Now.AddSeconds(1),cancellationTokenSource.Token); 
+        await task3.RunAtIntervals(3000, cancellationTokenSource.Token);
+        
     }
 }
