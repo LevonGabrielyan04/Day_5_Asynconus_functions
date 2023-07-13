@@ -146,11 +146,13 @@ class Program
         //await imgs.Resize();
 
         //Task 3
-        Task3 task3 = new Task3();
-        task3.funcsToExecute.Add(Test);
-        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-        cancellationTokenSource.CancelAfter(3);
+        //Task3 task3 = new Task3();
+        //task3.funcsToExecute.Add(Test);
+
+        //CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        //cancellationTokenSource.CancelAfter(3);
+
         //await task3.RunAtIntervals(3000,cancellationTokenSource.Token);
-        await task3.RunAtTime(DateTime.Now.AddSeconds(4),cancellationTokenSource.Token);
+        //await task3.RunAtTime(DateTime.Now.AddSeconds(4),cancellationTokenSource.Token);
     }
 }
