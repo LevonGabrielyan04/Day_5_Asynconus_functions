@@ -5,10 +5,13 @@ using System.Net.Http.Headers;
 class Task1
 {
     string path;
-    public Task task;
     public Task1(string Path)
     {
-        task = new Task(() =>
+        path = Path;
+    }
+    public Task Run()
+    {
+        return Task.Run(() =>
         {
             string p = File.ReadAllText(this.path);
             lock (Program.bigText)
@@ -16,9 +19,7 @@ class Task1
                 Program.bigText += p + "\n";
             }
         });
-        path = Path;
-    }
-
+    } 
 }
 class Task2
 {
@@ -76,23 +77,80 @@ class Task2
         });
     }
 }
+class Task3
+{
+    public List<Func<Task>> funcsToExecute;
+    public Task3()
+    {
+        funcsToExecute = new List<Func<Task>>();
+    }
+    public Task RunAtIntervals(int miliseconds,CancellationToken token)
+    {
+        return Task.Run(async () =>
+        {
+            bool flag = false;
+            while (true)
+            {
+                foreach (var item in funcsToExecute)
+                {
+                    await item();
+                    Thread.Sleep(miliseconds);
+                    if (token.IsCancellationRequested) { 
+                        flag = true;
+                        break;
+                    }
+                }
+                if(flag)
+                    break;
+            }
+        });
+    }
+    public Task RunAtTime(DateTime date,CancellationToken token)
+    {
+        return Task.Run(async () =>
+        {
+            Thread.Sleep(date - DateTime.Now);
+            foreach (var item in funcsToExecute)
+            {
+                if (token.IsCancellationRequested) { 
+                    break;
+                }
+                await item(); 
+            }
+        });
+    }
+}
 class Program
 {
+    static Task Test()
+    {
+        return Task.Run(() =>
+        {
+            Console.WriteLine("Running, on the way hiding");
+        });
+    }
     public static string bigText = String.Empty;
     async static Task Main()
     {
         //Task 1
         //var a = new Task1(@"C:\A\someText.txt");
         //var b = new Task1(@"C:\A\someText2.txt");
-        //a.task.Start();
-        //b.task.Start();
-        //Task.WaitAll(a.task, b.task);
+        //a.Run();
+        //b.Run();
         //Console.WriteLine(Program.bigText);
 
         //Task 2
-        Task2 imgs = new Task2(@"C:\OriginalImages");
-        await imgs.MakeBlackAndWhite();
-        imgs.paths = Directory.GetFiles(@"C:\BWImages");
-        await imgs.Resize();
+        //Task2 imgs = new Task2(@"C:\OriginalImages");
+        //await imgs.MakeBlackAndWhite();
+        //imgs.paths = Directory.GetFiles(@"C:\BWImages");
+        //await imgs.Resize();
+
+        //Task 3
+        Task3 task3 = new Task3();
+        task3.funcsToExecute.Add(Test);
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.CancelAfter(3);
+        //await task3.RunAtIntervals(3000,cancellationTokenSource.Token);
+        await task3.RunAtTime(DateTime.Now.AddSeconds(4),cancellationTokenSource.Token);
     }
 }
