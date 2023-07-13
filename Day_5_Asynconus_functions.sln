@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33829.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day_5_Asynconus_functions", "Day_5_Asynconus_functions\Day_5_Asynconus_functions.csproj", "{2DB6E957-676B-4AA1-9414-E589E830781C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2DB6E957-676B-4AA1-9414-E589E830781C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DB6E957-676B-4AA1-9414-E589E830781C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DB6E957-676B-4AA1-9414-E589E830781C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DB6E957-676B-4AA1-9414-E589E830781C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DF857D48-13C6-4A15-B690-70FA9F7A9795}
+	EndGlobalSection
+EndGlobal
