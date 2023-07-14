@@ -122,11 +122,11 @@ class Task3
         });
     }
 }
-class SynchronizationByLevon
+class Synchronization
 {
     int count;
     object lockObj;
-    public SynchronizationByLevon(int count)
+    public Synchronization(int count)
     {
         this.count = count;
         lockObj = new object();
@@ -157,12 +157,12 @@ class SynchronizationByLevon
 }
 class Program
 {
-    public static SynchronizationByLevon synchronization;
+    public static Synchronization synchronization;
     static Task Test()
     {
         return Task.Run(() =>
         {
-            Console.WriteLine("Running, on the way hiding");
+            Console.WriteLine("Running");
             synchronization.Pulse();
         });
     }
