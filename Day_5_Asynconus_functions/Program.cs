@@ -79,31 +79,34 @@ class Task2
 }
 class Task3
 {
-    public List<Func<Task>> funcsToExecute;
+    public List<Func<Synchronization,Task>> funcsToExecute;
     public Task3()
     {
-        funcsToExecute = new List<Func<Task>>();
+        funcsToExecute = new List<Func<Synchronization, Task>>();
     }
     public Task RunAtIntervals(int miliseconds,CancellationToken token)
     {
         return Task.Run(() =>
         {
             bool flag = false;
+            int count = funcsToExecute.Count;
+            Synchronization synchronization = new Synchronization(count);
             while (true)
             {
-                foreach (var item in funcsToExecute)
+                foreach(var item in funcsToExecute)
                 {
-                    item();
-                    if (token.IsCancellationRequested) { 
+                    item(synchronization);
+                    if (token.IsCancellationRequested)
+                    {
                         flag = true;
                         break;
                     }
                 }
                 Thread.Sleep(miliseconds);
-                if(flag)
+                if (flag)
                     break;
             }
-            Program.synchronization.Wait(); 
+            synchronization.Wait();
         });
     }
     public Task RunAtTime(DateTime date,CancellationToken token)
@@ -111,24 +114,27 @@ class Task3
         return Task.Run(() =>
         {
             Thread.Sleep(date - DateTime.Now);
+            Synchronization synchronization = new Synchronization(funcsToExecute.Count);
             foreach (var item in funcsToExecute)
             {
-                item();
+                item(synchronization);
                 if (token.IsCancellationRequested) { 
                     break;
                 }
             }
-            Program.synchronization.Wait();
+            synchronization.Wait();
         });
     }
 }
 class Synchronization
 {
-    int count;
+    public int count{get;private set;}
+    public int elapsed { get;private set;}
     object lockObj;
-    public Synchronization(int count)
+    public Synchronization(int count,int elapsed = 0)
     {
         this.count = count;
+        this.elapsed = elapsed;
         lockObj = new object();
     }
     public void Wait()
@@ -142,8 +148,8 @@ class Synchronization
     {
         lock (lockObj)
         {
-            count--;
-            if (count == 0)
+            elapsed++;
+            if (count == elapsed)
                 Monitor.Pulse(lockObj);
         }
     } 
@@ -157,8 +163,7 @@ class Synchronization
 }
 class Program
 {
-    public static Synchronization synchronization;
-    static Task Test()
+    static Task Test(Synchronization synchronization)
     {
         return Task.Run(() =>
         {
@@ -183,15 +188,13 @@ class Program
         //await imgs.Resize();
 
         //Task 3
-        //Task3 task3 = new Task3();
-        //task3.funcsToExecute.Add(Test);
+        Task3 task3 = new Task3();
+        task3.funcsToExecute.Add(Test);
 
-        //CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         //cancellationTokenSource.CancelAfter(3);
 
-        //synchronization = new SynchronizationByLevon(task3.funcsToExecute.Count);
-        //await task3.RunAtTime(DateTime.Now.AddSeconds(1),cancellationTokenSource.Token); //dont run this string and string below at the same time
-        //await task3.RunAtIntervals(3000, cancellationTokenSource.Token);
-        
+        //await task3.RunAtTime(DateTime.Now.AddSeconds(1),cancellationTokenSource.Token);
+        await task3.RunAtIntervals(3000, cancellationTokenSource.Token);
     }
 }
