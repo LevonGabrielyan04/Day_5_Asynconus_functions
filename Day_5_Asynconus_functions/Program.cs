@@ -95,6 +95,11 @@ class Task3
             {
                 foreach(var item in funcsToExecute)
                 {
+                    if(count != funcsToExecute.Count)
+                    { 
+                        synchronization = new Synchronization(funcsToExecute.Count,synchronization.elapsed);
+                        count = funcsToExecute.Count;
+                    }
                     item(synchronization);
                     if (token.IsCancellationRequested)
                     {
@@ -149,7 +154,7 @@ class Synchronization
         lock (lockObj)
         {
             elapsed++;
-            if (count == elapsed)
+            if (count <= elapsed)
                 Monitor.Pulse(lockObj);
         }
     } 
@@ -188,13 +193,13 @@ class Program
         //await imgs.Resize();
 
         //Task 3
-        Task3 task3 = new Task3();
-        task3.funcsToExecute.Add(Test);
+        //Task3 task3 = new Task3();
+        //task3.funcsToExecute.Add(Test);
 
-        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        //CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         //cancellationTokenSource.CancelAfter(3);
 
         //await task3.RunAtTime(DateTime.Now.AddSeconds(1),cancellationTokenSource.Token);
-        await task3.RunAtIntervals(3000, cancellationTokenSource.Token);
+        //await task3.RunAtIntervals(3000, cancellationTokenSource.Token);
     }
 }
