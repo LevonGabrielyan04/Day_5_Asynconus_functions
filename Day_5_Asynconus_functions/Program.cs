@@ -79,10 +79,10 @@ class Task2
 }
 class Task3
 {
-    public List<Func<Synchronization,Task>> funcsToExecute;
+    public List<Action<Synchronization>> funcsToExecute;
     public Task3()
     {
-        funcsToExecute = new List<Func<Synchronization, Task>>();
+        funcsToExecute = new List<Action<Synchronization>>();
     }
     public Task RunAtIntervals(int miliseconds,CancellationToken token)
     {
@@ -166,13 +166,14 @@ class Synchronization
 }
 class Program
 {
-    static Task Test(Synchronization synchronization)
+    static void Test(ref Synchronization synchronization)
     {
-        return Task.Run(() =>
+        Task task = Task.Run(() =>
         {
             Console.WriteLine("Running");
-            synchronization.Pulse();
         });
+        Task.WaitAll(task);
+        synchronization.Pulse();
     }
     public static string bigText = String.Empty;
     async static Task Main()
@@ -191,13 +192,13 @@ class Program
         //await imgs.Resize();
 
         //Task 3
-        //Task3 task3 = new Task3();
-        //task3.funcsToExecute.Add(Test);
+        Task3 task3 = new Task3();
+        task3.funcsToExecute.Add((syncronization) => Test(ref syncronization));
 
-        //CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         //cancellationTokenSource.CancelAfter(3);
 
         //await task3.RunAtTime(DateTime.Now.AddSeconds(1),cancellationTokenSource.Token);
-        //await task3.RunAtIntervals(3000, cancellationTokenSource.Token);
+        await task3.RunAtIntervals(3000, cancellationTokenSource.Token);
     }
 }
