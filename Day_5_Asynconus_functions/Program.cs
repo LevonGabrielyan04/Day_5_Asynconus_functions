@@ -192,13 +192,13 @@ class Program
         //await imgs.Resize();
 
         //Task 3
-        Task3 task3 = new Task3();
-        task3.funcsToExecute.Add((syncronization) => Test(ref syncronization));
+        //Task3 task3 = new Task3();
+        //task3.funcsToExecute.Add((syncronization) => Test(ref syncronization));
 
-        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        //CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         //cancellationTokenSource.CancelAfter(3);
 
         //await task3.RunAtTime(DateTime.Now.AddSeconds(1),cancellationTokenSource.Token);
-        await task3.RunAtIntervals(3000, cancellationTokenSource.Token);
+        //await task3.RunAtIntervals(3000, cancellationTokenSource.Token);
     }
 }
