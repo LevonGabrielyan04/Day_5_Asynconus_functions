@@ -88,10 +88,10 @@ class Task3
     {
         return Task.Run(() =>
         {
-            bool flag = false;
+            bool flag = true;
             int count = funcsToExecute.Count;
             Synchronization synchronization = new Synchronization(count);
-            while (true)
+            while (flag)
             {
                 foreach(var item in funcsToExecute)
                 {
@@ -103,13 +103,11 @@ class Task3
                     item(synchronization);
                     if (token.IsCancellationRequested)
                     {
-                        flag = true;
+                        flag = false;
                         break;
                     }
                 }
                 Thread.Sleep(miliseconds);
-                if (flag)
-                    break;
             }
             synchronization.Wait();
         });
